@@ -27,6 +27,7 @@ module.exports = function(filename, serverless, cache) {
   const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
 
   function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
+    console.log(`[serverless-plugin-include-dependencies]: going to check if module ${moduleName} is in package.json so it can be ignored`);
     for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
       const dependencies = baseDirPackageJsonObject[key];
 
@@ -35,7 +36,7 @@ module.exports = function(filename, serverless, cache) {
       }
     }
 
-    throw new Error(`module ${moduleName} should be ignored, but could not be found in package json...`);
+    throw new Error(`[serverless-plugin-include-dependencies]: module ${moduleName} should be ignored, but could not be found in package json...`);
   }
 
   function handle(name, basedir, optionalDependencies, peerDependenciesMeta) {
