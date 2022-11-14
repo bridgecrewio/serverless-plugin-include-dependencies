@@ -7,11 +7,17 @@ const resolve = require('resolve');
 const readPkgUp = require('read-pkg-up');
 const requirePackageName = require('require-package-name');
 const glob = require('glob');
+const lodash = require('lodash');
+const fs = require('fs');
 
 function ignoreMissing(dependency, optional, peerDependenciesMeta) {
   return optional && dependency in optional
     || peerDependenciesMeta && dependency in peerDependenciesMeta && peerDependenciesMeta[dependency].optional;
 }
+
+const shouldUseLocalNodeModules = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
+const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
+const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
 
 module.exports = function(filename, serverless, cache) {
   const servicePath = serverless.config.servicePath;
@@ -19,6 +25,18 @@ module.exports = function(filename, serverless, cache) {
   const filePaths = new Set();
   const modulesToProcess = [];
   const localFilesToProcess = [filename];
+
+  function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
+    for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
+      const dependencies = baseDirPackageJsonObject[key];
+
+      if (dependencies && Object.keys(dependencies).includes(moduleName)) {
+        return true;
+      }
+    }
+
+    throw new Error(`module ${moduleName} should be ignored, but could not be found in package json...`);
+  }
 
   function handle(name, basedir, optionalDependencies, peerDependenciesMeta) {
     const moduleName = requirePackageName(name.replace(/\\/, '/'));
@@ -29,8 +47,24 @@ module.exports = function(filename, serverless, cache) {
     }
 
     try {
-      const pathToModule = resolve.sync(path.join(moduleName, 'package.json'), { basedir });
-      const pkg = readPkgUp.sync({ cwd: pathToModule });
+      let pathToModule;
+      let pkg;
+
+      if (shouldIgnoreLocalPackageJsonDependencies && isModuleContainedInLocalPackageJSonDependencies(moduleName)) {
+        return;
+      }
+
+      if (shouldUseLocalNodeModules) {
+        pathToModule = path.join(basedir, 'node_modules', moduleName, 'package.json');
+        const jsonFile = fs.readFileSync(pathToModule).toString();
+        pkg = {
+          packageJson: JSON.parse(jsonFile),
+          path: pathToModule
+        }
+      } else {
+        pathToModule = resolve.sync(path.join(moduleName, 'package.json'), { basedir });
+        pkg = readPkgUp.sync({ cwd: pathToModule });
+      }
 
       if (pkg) {
         modulesToProcess.push(pkg);
