@@ -15,16 +15,16 @@ function ignoreMissing(dependency, optional, peerDependenciesMeta) {
     || peerDependenciesMeta && dependency in peerDependenciesMeta && peerDependenciesMeta[dependency].optional;
 }
 
-const shouldUseLocalNodeModules = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
-const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
-const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
-
 module.exports = function(filename, serverless, cache) {
   const servicePath = serverless.config.servicePath;
   const modulePaths = new Set();
   const filePaths = new Set();
   const modulesToProcess = [];
   const localFilesToProcess = [filename];
+
+  const shouldUseLocalNodeModules = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
+  const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
+  const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
 
   function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
     for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
