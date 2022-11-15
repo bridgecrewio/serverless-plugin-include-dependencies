@@ -40,6 +40,9 @@ module.exports = class IncludeDependencies {
       'before:deploy:function:packageFunction': this.functionDeploy.bind(this),
       'before:package:createDeploymentArtifacts': this.createDeploymentArtifacts.bind(this)
     };
+    this.serverless.cli.info(`[serverless-plugin-include-dependencies]: starting work`);
+    this.serverless.cli.log(`[serverless-plugin-include-dependencies]: starting work`);
+    console.info(`[serverless-plugin-include-dependencies]: starting work`);
   }
 
   functionDeploy() {
