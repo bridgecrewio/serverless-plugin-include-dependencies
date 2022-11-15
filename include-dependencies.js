@@ -121,6 +121,7 @@ module.exports = class IncludeDependencies {
     const relativeDependencies = dependencies.map(p => path.relative(servicePath, p));
 
     const exclusions = patterns.filter(p => {
+      console.info(`[serverless-plugin-include-dependencies]: in exclusions, pattern is: ${p}`);
       return !(p.indexOf('!node_modules') !== 0 || p === '!node_modules' || p === '!node_modules/**');
     });
 
