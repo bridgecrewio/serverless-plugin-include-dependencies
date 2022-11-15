@@ -88,8 +88,16 @@ module.exports = class IncludeDependencies {
 
     const target = this.individually ? functionObject : service;
     target.package.patterns = union(target.package.patterns, dependencies);
-    console.info(`dependencies are: ${JSON.stringify(dependencies)}`);
+    console.info(`after all, dependencies length is: ${dependencies.length}`);
+    this.serverless.cli.log(`after all, dependencies length is: ${dependencies.length}`);
+    while(dependencies.length > 0) {
+      const currentDependencies = dependencies.splice(0, 10);
+      console.info(`dependencies are: ${JSON.stringify(currentDependencies)}`);
+      this.serverless.cli.log(`dependencies are: ${JSON.stringify(currentDependencies)}`);
+    }
+
     console.info(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
+    this.serverless.cli.log(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
   }
 
   getFunctionRuntime(functionObject) {
@@ -118,8 +126,8 @@ module.exports = class IncludeDependencies {
 
     console.info("[serverless-plugin-include-dependencies]: testtttt before log");
 
-    this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
-    console.info(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
+    this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}, dependencies length: ${dependencies.length}`);
+    console.info(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}, dependencies length: ${dependencies.length}`);
 
     console.info("[serverless-plugin-include-dependencies]: testtttt after log");
 
