@@ -86,6 +86,8 @@ module.exports = class IncludeDependencies {
 
     const target = this.individually ? functionObject : service;
     target.package.patterns = union(target.package.patterns, dependencies);
+    console.log(`dependencies are: ${JSON.stringify(dependencies)}`);
+    console.log(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
   }
 
   getFunctionRuntime(functionObject) {
