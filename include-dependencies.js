@@ -90,14 +90,14 @@ module.exports = class IncludeDependencies {
     target.package.patterns = union(target.package.patterns, dependencies);
     console.info(`after all, dependencies length is: ${dependencies.length}`);
     this.serverless.cli.log(`after all, dependencies length is: ${dependencies.length}`);
-    while(dependencies.length > 0) {
-      const currentDependencies = dependencies.splice(0, 10);
-      console.info(`dependencies are: ${JSON.stringify(currentDependencies)}`);
-      this.serverless.cli.log(`dependencies are: ${JSON.stringify(currentDependencies)}`);
-    }
-
-    console.info(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
-    this.serverless.cli.log(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
+    // while(dependencies.length > 0) {
+    //   const currentDependencies = dependencies.splice(0, 10);
+    //   console.info(`dependencies are: ${JSON.stringify(currentDependencies)}`);
+    //   this.serverless.cli.log(`dependencies are: ${JSON.stringify(currentDependencies)}`);
+    // }
+    //
+    // console.info(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
+    // this.serverless.cli.log(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
   }
 
   getFunctionRuntime(functionObject) {

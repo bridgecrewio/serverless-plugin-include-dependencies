@@ -56,7 +56,7 @@ module.exports = function(filename, serverless, cache) {
       }
 
       if (shouldUseLocalNodeModules) {
-        pathToModule = path.join(basedir, 'node_modules', moduleName, 'package.json');
+        pathToModule = path.join(servicePath, 'node_modules', moduleName, 'package.json');
         const jsonFile = fs.readFileSync(pathToModule).toString();
         pkg = {
           packageJson: JSON.parse(jsonFile),
