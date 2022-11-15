@@ -157,8 +157,8 @@ module.exports = function(filename, serverless, cache) {
     });
   });
 
-  console.info(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(filePaths)}`);
-  serverless.cli.log(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(filePaths)}`);
+  console.info(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(Array.from(filePaths))}`);
+  serverless.cli.log(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(Array.from(filePaths))}`);
 
   return Array.from(filePaths);
 };

@@ -109,14 +109,14 @@ module.exports = class IncludeDependencies {
     const servicePath = this.serverless.config.servicePath;
     const dependencies = this.getDependencyList(fileName);
     const relativeDependencies = dependencies.map(p => path.relative(servicePath, p));
+    this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
+    console.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
 
     const exclusions = patterns.filter(p => {
       return !(p.indexOf('!node_modules') !== 0 || p === '!node_modules' || p === '!node_modules/**');
     });
 
-    this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
-    console.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
-    if (exclusions.length > 0) {
+       if (exclusions.length > 0) {
       return micromatch(relativeDependencies, exclusions);
     }
 
