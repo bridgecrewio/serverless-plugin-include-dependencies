@@ -125,6 +125,7 @@ module.exports = class IncludeDependencies {
     });
 
     console.info("[serverless-plugin-include-dependencies]: testtttt before log");
+    console.info(`[serverless-plugin-include-dependencies]: exclusion length: ${exclusions.length} and value is ${JSON.stringify(exclusions)}`);
 
     this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}, dependencies length: ${dependencies.length}`);
     console.info(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}, dependencies length: ${dependencies.length}`);
