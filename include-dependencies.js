@@ -84,10 +84,12 @@ module.exports = class IncludeDependencies {
     const fileName = this.getHandlerFilename(functionObject.handler);
     const dependencies = this.getDependencies(fileName, service.package.patterns);
 
+    console.info("[serverless-plugin-include-dependencies]: after dependencies");
+
     const target = this.individually ? functionObject : service;
     target.package.patterns = union(target.package.patterns, dependencies);
-    console.log(`dependencies are: ${JSON.stringify(dependencies)}`);
-    console.log(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
+    console.info(`dependencies are: ${JSON.stringify(dependencies)}`);
+    console.info(`now patterns are: ${JSON.stringify(target.package.patterns)}`);
   }
 
   getFunctionRuntime(functionObject) {
@@ -114,8 +116,12 @@ module.exports = class IncludeDependencies {
       return !(p.indexOf('!node_modules') !== 0 || p === '!node_modules' || p === '!node_modules/**');
     });
 
+    console.info("[serverless-plugin-include-dependencies]: testtttt before log");
+
     this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
-    console.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
+    console.info(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
+
+    console.info("[serverless-plugin-include-dependencies]: testtttt after log");
 
     if (exclusions.length > 0) {
       return micromatch(relativeDependencies, exclusions);
