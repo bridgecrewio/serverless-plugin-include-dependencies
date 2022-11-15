@@ -111,6 +111,7 @@ module.exports = class IncludeDependencies {
     });
 
     this.serverless.cli.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
+    console.log(`[serverless-plugin-include-dependencies]: after getDependencyList, dependencies are: ${JSON.stringify(dependencies)}, exclusions are: ${JSON.stringify(exclusions)}`);
     if (exclusions.length > 0) {
       return micromatch(relativeDependencies, exclusions);
     }
