@@ -158,7 +158,6 @@ module.exports = function(filename, serverless, cache) {
   });
 
   console.info(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(filePaths)}`);
-  serverless.cli.info(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(filePaths)}`);
   serverless.cli.log(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(filePaths)}`);
 
   return Array.from(filePaths);
