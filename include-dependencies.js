@@ -87,7 +87,9 @@ module.exports = class IncludeDependencies {
     console.info("[serverless-plugin-include-dependencies]: after dependencies");
 
     const target = this.individually ? functionObject : service;
+    console.info(`package target patterns are: ${JSON.stringify(target.package.patterns)}`);
     target.package.patterns = union(target.package.patterns, dependencies);
+    console.info(`after union, package target patterns length is ${target.package.patterns.length}`);
     console.info(`after all, dependencies length is: ${dependencies.length}`);
     this.serverless.cli.log(`after all, dependencies length is: ${dependencies.length}`);
     // while(dependencies.length > 0) {
