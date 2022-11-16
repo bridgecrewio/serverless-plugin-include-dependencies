@@ -13,20 +13,17 @@ function ignoreMissing(dependency, optional, peerDependenciesMeta) {
     || peerDependenciesMeta && dependency in peerDependenciesMeta && peerDependenciesMeta[dependency].optional;
 }
 
-module.exports = function(filename, serverless, cache) {
+module.exports = function(filename, serverless) {
   const servicePath = serverless.config.servicePath;
-  const modulePaths = new Set();
+
   const filePaths = new Set();
+  const modulePaths = new Set();
+
   const modulesToProcess = [];
   const localFilesToProcess = [filename];
 
   function handle(name, basedir, optionalDependencies, peerDependenciesMeta) {
     const moduleName = requirePackageName(name.replace(/\\/, '/'));
-    const cacheKey = `${basedir}:${name}`;
-
-    if (cache && cache.has(cacheKey)) {
-      return;
-    }
 
     try {
       const pathToModule = resolve.sync(path.join(moduleName, 'package.json'), { basedir });
@@ -34,11 +31,6 @@ module.exports = function(filename, serverless, cache) {
 
       if (pkg) {
         modulesToProcess.push(pkg);
-
-        if (cache) {
-          cache.add(cacheKey);
-        }
-  
       } else {
         // TODO: should we warn here?
       }
@@ -52,14 +44,9 @@ module.exports = function(filename, serverless, cache) {
           // this resolves the requested import also against any set up NODE_PATH extensions, etc.
           const resolved = require.resolve(name);
           localFilesToProcess.push(resolved);
-
-          if (cache) {
-            cache.add(cacheKey);
-          }
-
           return;
         } catch(e) {
-          throw new Error(`[serverless-plugin-include-dependencies]: Could not find npm package: ${moduleName}`);
+          throw new Error(`[serverless-plugin-include-dependencies]: Could not find ${moduleName}`);
         }
       }
       throw e;

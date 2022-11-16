@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-include-dependencies",
-  "version": "5.0.0",
+  "version": "4.1.0",
   "engines": {
     "node": ">=4.0"
   },
@@ -22,15 +22,16 @@
   },
   "devDependencies": {
     "ava": "^3.0.0",
-    "eslint": "^7.30.0",
+    "eslint": "^6.8.0",
     "lodash": "^4.17.11",
     "nyc": "^15.0.0",
-    "sinon": "^11.1.1",
+    "sinon": "^8.1.1",
     "updater-contributors": "^0.1.2"
   },
   "dependencies": {
+    "glob": "^7.1.6",
     "micromatch": "^4.0.2",
-    "precinct": "^8.1.0",
+    "precinct": "^6.2.0",
     "read-pkg-up": "^7.0.1",
     "require-package-name": "^2.0.1",
     "resolve": "^1.15.0",

@@ -4,37 +4,25 @@ const path = require('path');
 
 const semver = require('semver');
 const micromatch = require('micromatch');
+const glob = require('glob');
+const fs = require('fs');
 
 const getDependencyList = require('./get-dependency-list');
 
-function union(a = [], b = []) {
-  const existing = [].concat(a);
-  const set = new Set(existing);
-
-  [].concat(b).forEach(p => {
-    if (set.has(p)) {
-      return;
-    }
-    set.add(p);
-    existing.push(p);
-  });
-
-  return existing;
+function union(a, b) {
+  const arr = a || [];
+  return Array.from(new Set(arr.concat(b || [])));
 }
 
 module.exports = class IncludeDependencies {
 
   constructor(serverless, options) {
-    if (!semver.satisfies(serverless.version, '>= 2.32')) {
-      throw new Error('serverless-plugin-include-dependencies requires serverless 2.32 or higher!');
+    if (!semver.satisfies(serverless.version, '>= 1.13')) {
+      throw new Error('serverless-plugin-include-dependencies requires serverless 1.13 or higher!');
     }
 
     this.serverless = serverless;
     this.options = options;
-    this.cache = new Set();
-
-    const service = this.serverless.service;
-    this.individually = service.package && service.package.individually;
 
     this.hooks = {
       'before:deploy:function:packageFunction': this.functionDeploy.bind(this),
@@ -47,26 +35,50 @@ module.exports = class IncludeDependencies {
   }
 
   createDeploymentArtifacts() {
-    const { service = {} } = this.serverless;
-    const { functions = {} } = service;
-
-    for (const functionName in functions) {
-      this.processFunction(functionName);
+    const service = this.serverless.service;
+    if (typeof service.functions === 'object') {
+      Object.keys(service.functions).forEach(functionName => {
+        this.processFunction(functionName);
+      });
     }
   }
 
   processFunction(functionName) {
-    const { service = {} } = this.serverless;
-
-    service.package = service.package || {};
-    service.package.patterns = union(['!node_modules/**'], service.package.patterns);
+    const service = this.serverless.service;
 
     const functionObject = service.functions[functionName];
     const runtime = this.getFunctionRuntime(functionObject);
 
-    if (/(provided|nodejs)+/.test(runtime)) {
+    functionObject.package = functionObject.package || {};
+
+    service.package = service.package || {};
+    service.package.exclude = union(service.package.exclude, ['node_modules/**']);
+
+    if (runtime === 'provided' || runtime.match(/nodejs*/)) {
+      this.processIncludes(functionObject);
       this.processNodeFunction(functionObject);
     }
+  }
+
+  includeGlobs(target, include, exclude) {
+    include.forEach(includeGlob => {
+      this.include(target, [includeGlob]);
+      glob.sync(path.join(this.serverless.config.servicePath, includeGlob))
+        .filter(p => !exclude.some(e => {
+          if (e.indexOf('node_modules') !== 0 || e === 'node_modules' || e === 'node_modules/**') {
+            return false;
+          }
+          return micromatch.contains(p, e);
+        }))
+        .forEach(filePath => {
+          var stat = fs.statSync(filePath);
+          if (stat && stat.isFile()) {
+            const dependencies = this.getDependencies(filePath, exclude);
+            this.include(target, dependencies);
+          }
+        });
+      }
+    );
   }
 
   getPluginOptions() {
@@ -74,56 +86,74 @@ module.exports = class IncludeDependencies {
     return (service.custom && service.custom.includeDependencies) || {};
   }
 
+  processIncludes(functionObject) {
+    const service = this.serverless.service;
+    const options = this.getPluginOptions();
+    if (!options || !options.always) {
+      return;
+    }
+    const include = union(options.always, []);
+    if (service.package && service.package.individually) {
+      const exclude = union(service.package.exclude, functionObject.package.exclude);
+      this.includeGlobs(functionObject, include, exclude);
+    } else {
+      const exclude = service.package.exclude || [];
+      this.includeGlobs(service, include, exclude);
+    }
+  }
+
   processNodeFunction(functionObject) {
-    const { service } = this.serverless;
+    const service = this.serverless.service;
 
-    functionObject.package = functionObject.package || {};
-    
     const fileName = this.getHandlerFilename(functionObject.handler);
-    const dependencies = this.getDependencies(fileName, service.package.patterns);
 
-    const target = this.individually ? functionObject : service;
-    target.package.patterns = union(target.package.patterns, dependencies);
+    if (service.package && service.package.individually) {
+      const exclude = union(service.package.exclude, functionObject.package.exclude);
+      const dependencies = this.getDependencies(fileName, exclude);
+
+      this.include(functionObject, dependencies);
+    } else {
+      const exclude = service.package.exclude;
+      const dependencies = this.getDependencies(fileName, exclude);
+
+      this.include(service, dependencies);
+    }
   }
 
   getFunctionRuntime(functionObject) {
-    const { service } = this.serverless;
+    const service = this.serverless.service;
 
     const functionRuntime = functionObject.runtime;
     const providerRuntime = service.provider && service.provider.runtime;
 
-    return functionRuntime || providerRuntime;
+    return functionRuntime || providerRuntime || 'nodejs4.3';
   }
 
   getHandlerFilename(handler) {
-    const lastDotIndex = handler.lastIndexOf('.');
-    const handlerPath = lastDotIndex !== -1 ? handler.slice(0, lastDotIndex) : 'index';
+    const handlerPath = handler.slice(0, handler.lastIndexOf('.'));
     return require.resolve((path.join(this.serverless.config.servicePath, handlerPath)));
   }
 
-  getDependencies(fileName, patterns) {
+  getDependencies(fileName, exclude) {
     const servicePath = this.serverless.config.servicePath;
     const dependencies = this.getDependencyList(fileName);
-    const relativeDependencies = dependencies.map(p => path.relative(servicePath, p));
 
-    const exclusions = patterns.filter(p => {
-      return !(p.indexOf('!node_modules') !== 0 || p === '!node_modules' || p === '!node_modules/**');
+    const relativeDependencies = dependencies.map(p => path.relative(servicePath, p));
+    const exclusions = exclude.filter(e => {
+      return !(e.indexOf('node_modules') !== 0 || e === 'node_modules' || e === 'node_modules/**');
     });
 
-    if (exclusions.length > 0) {
-      return micromatch(relativeDependencies, exclusions);
-    }
-
-    return relativeDependencies;
+    return relativeDependencies.filter(p => {
+      return !micromatch.some(p, exclusions);
+    });
   }
 
   getDependencyList(fileName) {
-    if (!this.individually) {
-      const options = this.getPluginOptions();
-      if (options && options.enableCaching) {
-        return getDependencyList(fileName, this.serverless, this.cache);
-      }
-    }
     return getDependencyList(fileName, this.serverless);
   }
+
+  include(target, dependencies) {
+    target.package.include = union(target.package.include, dependencies);
+  }
+
 };
