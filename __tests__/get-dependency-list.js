@@ -125,19 +125,19 @@ test('understands local named dependencies', (t) => {
 test('serverless is null - expect to throw exception', (t) => {
   const fileName = path.join(__dirname, 'fixtures', 'dep-missing-peer.js');
   const error = t.throws(() => getDependencyList(fileName, null));
-  t.is(error.message, 'Cannot read property \'config\' of null');
+  t.is(error.message, 'Cannot read properties of null (reading \'config\')');
 });
 
 test('serverless is undefined - expect to throw exception', (t) => {
   const fileName = path.join(__dirname, 'fixtures', 'dep-missing-peer.js');
   const error = t.throws(() => getDependencyList(fileName, undefined));
-  t.is(error.message, 'Cannot read property \'config\' of undefined');
+  t.is(error.message, 'Cannot read properties of undefined (reading \'config\')');
 });
 
 test('serverless is empty - expect to throw exception', (t) => {
   const fileName = path.join(__dirname, 'fixtures', 'dep-missing-peer.js');
   const error = t.throws(() => getDependencyList(fileName, null));
-  t.is(error.message, 'Cannot read property \'config\' of null');
+  t.is(error.message, 'Cannot read properties of null (reading \'config\')');
 });
 
 test('serverless service is empty - should define false default values and include a dependency', (t) => {
