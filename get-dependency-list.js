@@ -24,12 +24,12 @@ module.exports = function(filename, serverless) {
   const modulesToProcess = [];
   const localFilesToProcess = [filename];
 
-  const shouldUseLocalNodeModules = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
-  const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless.service.custom, 'serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
+  const shouldUseLocalNodeModules = lodash.get(serverless, 'service.custom.serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
+  const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless, 'service.custom.serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
   const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
 
   function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
-    console.log(`[serverless-plugin-include-dependencies]: going to check if module ${moduleName} is in package.json so it can be ignored`);
+    serverless.cli.log(`[serverless-plugin-include-dependencies]: going to check if module ${moduleName} is in package.json so it can be ignored`);
     for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
       const dependencies = baseDirPackageJsonObject[key];
 
