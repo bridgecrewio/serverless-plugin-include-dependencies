@@ -144,7 +144,5 @@ module.exports = function(filename, serverless) {
     });
   });
 
-  console.info(`[serverless-plugin-include-dependencies]: file paths are - ${JSON.stringify(Array.from(filePaths))}`);
-
   return Array.from(filePaths);
 };

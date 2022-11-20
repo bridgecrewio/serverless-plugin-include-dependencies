@@ -28,7 +28,6 @@ module.exports = class IncludeDependencies {
       'before:deploy:function:packageFunction': this.functionDeploy.bind(this),
       'before:package:createDeploymentArtifacts': this.createDeploymentArtifacts.bind(this)
     };
-    console.info(`[serverless-plugin-include-dependencies]: starting work`);
   }
 
   functionDeploy() {
@@ -122,9 +121,8 @@ module.exports = class IncludeDependencies {
       const dependencies = this.getDependencies(fileName, exclude);
 
       console.info(`[serverless-plugin-include-dependencies]: after getDependencies, no individual, size of dependencies is: ${dependencies.length}`);
-      console.info(`[serverless-plugin-include-dependencies]: after include, no individual, size of dependencies is: ${functionObject.package.include.length}`);
-
       this.include(service, dependencies);
+      console.info(`[serverless-plugin-include-dependencies]: after include, no individual, size of dependencies is: ${service.package.include.length}`);
     }
   }
 
