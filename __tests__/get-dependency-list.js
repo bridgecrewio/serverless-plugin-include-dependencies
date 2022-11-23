@@ -210,6 +210,47 @@ test('serverless service serverless-plugin-include-dependencies is undefined - s
   t.true(list.some(item => item.match(/jwa/)));
 });
 
+test('serverless shouldUseLocalNodeModules is undefined - should use false value and include a dependency', (t) => {
+  const fileName = path.join(__dirname, 'fixtures', 'thing.js');
+
+  const localServerless = serverless;
+  localServerless['service'] = {custom: {"serverless-plugin-include-dependencies": {shouldUseLocalNodeModules: undefined}}};
+  const list = getDependencyList(fileName, localServerless);
+
+  t.true(list.some(item => item.match(/jwa/)));
+});
+
+test('serverless shouldUseLocalNodeModules is null - should use false value and include a dependency', (t) => {
+  const fileName = path.join(__dirname, 'fixtures', 'thing.js');
+
+  const localServerless = serverless;
+  localServerless['service'] = {custom: {"serverless-plugin-include-dependencies": {shouldUseLocalNodeModules: null}}};
+  const list = getDependencyList(fileName, localServerless);
+
+  t.true(list.some(item => item.match(/jwa/)));
+});
+
+test('serverless shouldIgnorePackageJsonDependencies is undefined - should use false value and include a dependency', (t) => {
+  const fileName = path.join(__dirname, 'fixtures', 'thing.js');
+
+  const localServerless = serverless;
+  localServerless['service'] = {custom: {"serverless-plugin-include-dependencies": {shouldIgnorePackageJsonDependencies: undefined}}};
+  const list = getDependencyList(fileName, localServerless);
+
+  t.true(list.some(item => item.match(/jwa/)));
+});
+
+test('serverless shouldIgnorePackageJsonDependencies is null - should use false value and include a dependency', (t) => {
+  const fileName = path.join(__dirname, 'fixtures', 'thing.js');
+
+  const localServerless = serverless;
+  localServerless['service'] = {custom: {"serverless-plugin-include-dependencies": {shouldIgnorePackageJsonDependencies: null}}};
+  const list = getDependencyList(fileName, localServerless);
+
+  t.true(list.some(item => item.match(/jwa/)));
+});
+
+
 test('serverless shouldUseLocalNodeModules is false - should include a dependency', (t) => {
   const fileName = path.join(__dirname, 'fixtures', 'thing.js');
 

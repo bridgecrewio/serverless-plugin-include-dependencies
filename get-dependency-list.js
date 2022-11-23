@@ -7,7 +7,6 @@ const resolve = require('resolve');
 const readPkgUp = require('read-pkg-up');
 const requirePackageName = require('require-package-name');
 const glob = require('glob');
-const lodash = require('lodash');
 const fs = require('fs');
 
 function ignoreMissing(dependency, optional, peerDependenciesMeta) {
@@ -24,8 +23,8 @@ module.exports = function(filename, serverless) {
   const modulesToProcess = [];
   const localFilesToProcess = [filename];
 
-  const shouldUseLocalNodeModules = lodash.get(serverless, 'service.custom.serverless-plugin-include-dependencies.shouldUseLocalNodeModules', false);
-  const shouldIgnoreLocalPackageJsonDependencies = lodash.get(serverless, 'service.custom.serverless-plugin-include-dependencies.shouldIgnorePackageJsonDependencies', false);
+  const shouldUseLocalNodeModules = !!serverless.service?.custom?.['serverless-plugin-include-dependencies']?.shouldUseLocalNodeModules;
+  const shouldIgnoreLocalPackageJsonDependencies = !!serverless.service?.custom?.['serverless-plugin-include-dependencies']?.shouldIgnorePackageJsonDependencies;
   const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, "package.json")).toString()) : undefined;
 
   function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
