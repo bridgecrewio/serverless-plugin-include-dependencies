@@ -111,12 +111,18 @@ module.exports = class IncludeDependencies {
       const exclude = union(service.package.exclude, functionObject.package.exclude);
       const dependencies = this.getDependencies(fileName, exclude);
 
+      console.info(`[serverless-plugin-include-dependencies]: after getDependencies, individual package, size of dependencies is: ${dependencies.length}`);
+
       this.include(functionObject, dependencies);
+      console.info(`[serverless-plugin-include-dependencies]: after include, individual package, size of dependencies is: ${functionObject.package.include.length}`);
+
     } else {
       const exclude = service.package.exclude;
       const dependencies = this.getDependencies(fileName, exclude);
 
+      console.info(`[serverless-plugin-include-dependencies]: after getDependencies, no individual, size of dependencies is: ${dependencies.length}`);
       this.include(service, dependencies);
+      console.info(`[serverless-plugin-include-dependencies]: after include, no individual, size of dependencies is: ${service.package.include.length}`);
     }
   }
 
