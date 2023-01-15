@@ -33,8 +33,7 @@ module.exports = function(filename, serverless) {
     for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
       const dependencies = baseDirPackageJsonObject[key];
 
-      if (dependencies && Object.keys(dependencies).includes(moduleName) ||
-          packagesToBeIgnored.includes(moduleName)) {
+      if (dependencies && Object.keys(dependencies).includes(moduleName)) {
         return true;
       }
     }
