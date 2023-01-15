@@ -26,24 +26,17 @@ module.exports = function(filename, serverless) {
   const shouldUseLocalNodeModules = !!serverless.service?.custom?.['serverless-plugin-include-dependencies']?.shouldUseLocalNodeModules;
   const shouldIgnoreLocalPackageJsonDependencies = !!serverless.service?.custom?.['serverless-plugin-include-dependencies']?.shouldIgnorePackageJsonDependencies;
   const baseDirPackageJsonObject = shouldIgnoreLocalPackageJsonDependencies ? JSON.parse(fs.readFileSync(path.join(servicePath, 'package.json')).toString()) : undefined;
-  const packagesToBeIncludedGloballyInIgnoreLocalNodeModules = serverless.service?.custom?.['serverless-plugin-include-dependencies']?.packagesToBeIncludedGlobally || [];
-
-  serverless.cli.log(`[serverless-plugin-include-dependencies] serverless object is ${JSON.stringify(serverless.service?.custom?.['serverless-plugin-include-dependencies']?.packagesToBeIncludedGlobally)}`);
+  const packagesToBeIgnored = serverless.service?.custom?.['serverless-plugin-include-dependencies']?.packagesToBeIgnored || [];
 
   function isModuleContainedInLocalPackageJSonDependencies(moduleName) {
     serverless.cli.log(`[serverless-plugin-include-dependencies]: going to check if module ${moduleName} is in package.json so it can be ignored`);
     for(const key of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
       const dependencies = baseDirPackageJsonObject[key];
 
-      if (dependencies && Object.keys(dependencies).includes(moduleName)) {
+      if (dependencies && Object.keys(dependencies).includes(moduleName) ||
+          packagesToBeIgnored.includes(moduleName)) {
         return true;
       }
-
-      if (packagesToBeIncludedGloballyInIgnoreLocalNodeModules.includes(moduleName)) {
-        serverless.cli.log(`[serverless-plugin-include-dependencies]: module ${moduleName} should be globally included`);
-        return false;
-      }
-
     }
 
     throw new Error(`[serverless-plugin-include-dependencies]: module ${moduleName} should be ignored, but could not be found in package json...`);
@@ -55,6 +48,11 @@ module.exports = function(filename, serverless) {
     try {
       let pathToModule;
       let pkg;
+
+      if (packagesToBeIgnored.includes(moduleName)) {
+        serverless.cli.log(`[serverless-plugin-include-dependencies]: module ${moduleName} should be globally ignored`);
+        return;
+      }
 
       if (shouldIgnoreLocalPackageJsonDependencies && isModuleContainedInLocalPackageJSonDependencies(moduleName)) {
         return;
