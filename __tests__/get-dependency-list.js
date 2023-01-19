@@ -381,6 +381,5 @@ test('serverless packagesToBeIgnored contains a package to ignore that is not in
   t.true(list[0] === fileName);
   t.true(log.called);
   t.true(log.callCount === 1);
-  // t.true(log.args[0][0] === '[serverless-plugin-include-dependencies]: going to check if module ava is in package.json so it can be ignored');
   t.true(log.args[0][0] === '[serverless-plugin-include-dependencies]: module ava should be globally ignored');
 });
