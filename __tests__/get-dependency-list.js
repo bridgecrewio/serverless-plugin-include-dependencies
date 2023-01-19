@@ -365,7 +365,7 @@ test('serverless shouldUseLocalNodeModules is true - but dependency is not in lo
   t.true(error.message.startsWith('ENOENT: no such file or directory'));
 });
 
-test('serverless packagesToBeIncludedGlobally contains a package to ignore that is not included in local package.json - should ignore', (t) => {
+test('serverless packagesToBeIgnored contains a package to ignore that is not included in local package.json - should ignore', (t) => {
   const fileName = path.join(__dirname, 'fixtures', 'packagesToBeIgnored.js');
   const log = sinon.stub();
 
@@ -373,7 +373,7 @@ test('serverless packagesToBeIncludedGlobally contains a package to ignore that 
     config: {
       servicePath: path.join(__dirname, '/../')
     },
-    service: {custom: {"serverless-plugin-include-dependencies": {packagesToBeIncludedGlobally: ['ava']}}}
+    service: {custom: {"serverless-plugin-include-dependencies": {packagesToBeIgnored: ['ava']}}}
   };
   const list = getDependencyList(fileName, Object.assign({cli: {log}}, localServerless));
 
