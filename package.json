@@ -21,7 +21,7 @@
     "posttest": "eslint ."
   },
   "devDependencies": {
-    "ava": "^3.0.0",
+    "ava": "^5.2.0",
     "eslint": "^7.5",
     "lodash": "^4.17.11",
     "nyc": "^15.0.0",
